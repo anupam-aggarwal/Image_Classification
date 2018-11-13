@@ -19,10 +19,10 @@ classifier.add(Flatten())
 
 #Fully Connected Layer
 classifier.add(Dense(units = 128,activation = 'relu'))
-classifier.add(Dense(units = 1,activation = 'softmax'))
-
+#classifier.add(Dense(units = 1,activation = 'sigmoid'))
+classifier.add(Dense(units = 3,activation = 'softmax'))
 #compiling the CNN
-classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'] )			#need to think about loss function
+classifier.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'] )			#need to think about loss function
 
 # Fitting CNN to images
 from keras.preprocessing.image import ImageDataGenerator
@@ -39,17 +39,17 @@ training_set = train_datagen.flow_from_directory(									#need to think about b
         'img',
         target_size=(64, 64),
         batch_size=32,
-        class_mode='binary')
+        class_mode='categorical')
 
 test_set = test_datagen.flow_from_directory(
         'img',
         target_size=(64, 64),
         batch_size=32,
-        class_mode='binary')
+        class_mode='categorical')
 
 classifier.fit_generator(															#need to tweak its params
         training_set,
-        steps_per_epoch=551,
+        steps_per_epoch=785,
         epochs=25,
         validation_data=test_set,
         validation_steps=100)
