@@ -27,8 +27,8 @@ indices = {'78': 576, '36': 290, '496': 441, '465': 407, '555': 507, '174': 84, 
 
 indices = indices.items()
 count = 0
-for filename in os.listdir("../Sanskrit-letter-dataset/images_in1folder"):  #../Sanskrit-letter-dataset/images_in1folder
-	test_image = image.load_img('../Sanskrit-letter-dataset/images_in1folder/'+filename,target_size = (64,64))
+for filename in os.listdir("./images_in1folder"):  #../Sanskrit-letter-dataset/images_in1folder
+	test_image = image.load_img('./images_in1folder/'+filename,target_size = (64,64))
 	test_image = image.img_to_array(test_image)
 	test_image = np.expand_dims(test_image,axis=0)
 	result = model.predict(test_image)
