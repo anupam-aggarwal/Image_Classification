@@ -4,12 +4,14 @@ from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.layers import Flatten
 from keras.layers import Dense
+from keras.utils import plot_model
 from keras import optimizers
+import matplotlib.pyplot as plt
 #from PIL import Image
 import numpy as np
 #import cv2
 import os
-
+np.random.seed(1024)
 '''
 #code to read images as numpy arrays and save them in files
 images_x = []
@@ -35,25 +37,25 @@ data_Y = np.eye(np.max(data_Y)+1)[data_Y]
 classifier = Sequential()
 
 # Convolution Layer
-classifier.add(Conv2D(32,(3,3),input_shape = (32,32,3), activation='relu',padding='same'))
+classifier.add(Conv2D(4,(3,3),input_shape = (32,32,3), activation='relu',padding='same',kernel_initializer='glorot_normal'))
 
 # Convolution Layer
-classifier.add(Conv2D(32,(3,3), activation='relu',padding='same'))
+classifier.add(Conv2D(4,(3,3), activation='relu',padding='same',kernel_initializer='glorot_normal'))
 
 # Convolution Layer
-classifier.add(Conv2D(32,(3,3),activation='relu',padding='same'))
+classifier.add(Conv2D(4,(3,3),activation='relu',padding='same',kernel_initializer='glorot_normal'))
 
 #Pooling Layer
 classifier.add(MaxPooling2D(pool_size = (2,2)))
 
 # Convolution Layer
-classifier.add(Conv2D(64,(3,3), activation='relu',padding='same'))
+classifier.add(Conv2D(8,(3,3), activation='relu',padding='same',kernel_initializer='glorot_normal'))
 
 # Convolution Layer
-classifier.add(Conv2D(64,(3,3), activation='relu',padding='same'))
+classifier.add(Conv2D(8,(3,3), activation='relu',padding='same',kernel_initializer='glorot_normal'))
 
 # Convolution Layer
-classifier.add(Conv2D(64,(3,3), activation='relu',padding='same'))
+classifier.add(Conv2D(8,(3,3), activation='relu',padding='same',kernel_initializer='glorot_normal'))
 
 #Pooling Layer
 classifier.add(MaxPooling2D(pool_size = (2,2)))
@@ -62,25 +64,48 @@ classifier.add(MaxPooling2D(pool_size = (2,2)))
 classifier.add(Flatten())
 
 #Fully Connected Layer
-classifier.add(Dense(units = 2048,activation = 'relu'))
+#classifier.add(Dense(units = 2048,activation = 'relu'))
 classifier.add(Dense(units = 1024,activation = 'relu'))
 classifier.add(Dense(units = 600,activation = 'softmax'))
 
+print(classifier.summary())
+
 #compiling the CNN
-classifier.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'] )			#need to think about loss function
+opt = optimizers.SGD(lr=0.01)
+classifier.compile(optimizer = opt, loss = 'categorical_crossentropy', metrics = ['accuracy'] )			#need to think about loss function
 
 
 
-classifier.fit(x=data_X,y=data_Y,batch_size=32,epochs=125,validation_split=0.01)
+history = classifier.fit(x=data_X,y=data_Y,batch_size=128,epochs=50,validation_split=0.01)
+
+plot_model(classifier, to_file='Final_model.png')
+
+# Plot training & validation accuracy values
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper left')
+plt.show()
+
+# Plot training & validation loss values
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('Model loss')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper left')
+plt.show()
 
 
 #to save model to disk
 # serialize model to JSON
 model_json = classifier.to_json()
-with open("model.json", "w") as json_file:
+with open("Final_model.json", "w") as json_file:
     json_file.write(model_json)
 # serialize weights to HDF5
-classifier.save_weights("model.h5")
+classifier.save_weights("Final_model.h5")
 print("Saved model to disk")
 
 
